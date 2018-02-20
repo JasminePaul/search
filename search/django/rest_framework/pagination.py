@@ -11,7 +11,8 @@ class SearchPageNumberPagination(drf_pagination.PageNumberPagination):
     in place of the DjangoPaginator.
     """
     def paginate_queryset(self, queryset, request, view=None):
-        self._handle_backwards_compat(view)
+        if hasattr(self, '_handle_backwards_compat'):
+            self._handle_backwards_compat(view)
 
         page_size = self.get_page_size(request)
         if not page_size:
