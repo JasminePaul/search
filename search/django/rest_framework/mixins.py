@@ -63,7 +63,7 @@ class SearchMixin(object):
             # There was an exception trying to parse the query string. Rather
             # than logging the query to the user, pretend there were no results
             page = None
-            queryset = []
+            queryset = queryset.none()
 
         if self.is_searching():
             # patch the raw query onto the object for get_paginated_response to use
