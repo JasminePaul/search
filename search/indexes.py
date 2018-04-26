@@ -247,7 +247,7 @@ class Index(object):
                 include_start_object=False
             )
 
-    def search(self, document_class=None, ids_only=False):
+    def search(self, document_class=None, ids_only=False, deadline=None):
         """Initialise the search query for this index and document class"""
         document_class = document_class or self.document_class
         if not document_class:
@@ -260,5 +260,6 @@ class Index(object):
         return SearchQuery(
             self._index,
             document_class=document_class,
-            ids_only=ids_only
+            ids_only=ids_only,
+            deadline=deadline,
         )

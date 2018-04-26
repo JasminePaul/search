@@ -90,7 +90,7 @@ class SearchQuery(object):
     ASC = search_api.SortExpression.ASCENDING
     DESC = search_api.SortExpression.DESCENDING
 
-    def __init__(self, index, document_class=None, ids_only=False):
+    def __init__(self, index, document_class=None, ids_only=False, deadline=None):
         """Arguments:
 
             * index: The Google search API index object to act on.
@@ -98,6 +98,8 @@ class SearchQuery(object):
                 from search results.
             * ids_only: Whether or not this query should return only the IDs of
                 the documents found, or the full documents themselves.
+            * deadline: Time in seconds the search API will wait before raising
+                a Timeout exception.
         """
         self.index = index
         self.document_class = document_class
@@ -110,6 +112,7 @@ class SearchQuery(object):
         self._cursor = None
         self._next_cursor = None
         self._has_set_limits = False
+        self._deadline = deadline
 
         self._sorts = []
         self._match_scorer = None
@@ -185,6 +188,7 @@ class SearchQuery(object):
         new_query._sorts = self._sorts
         new_query._snippeted_fields = self._snippeted_fields
         new_query._returned_expressions = self._returned_expressions
+        new_query._deadline = self._deadline
         new_query.query = self.query._clone()
 
         # XXX: Copy raw query in clone
@@ -410,9 +414,12 @@ class SearchQuery(object):
         )
         search_query = search_api.Query(
             query_string=query_string,
-            options=search_options
+            options=search_options,
         )
 
-        self._results_response = self.index.search(search_query)
+        self._results_response = self.index.search(
+            search_query,
+            deadline=self._deadline
+        )
         self._number_found = self._results_response.number_found
         self._next_cursor = self._results_response.cursor
