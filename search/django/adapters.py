@@ -35,13 +35,22 @@ class SearchQueryAdapter(object):
         if isinstance(queryset, cls):
             return queryset
 
-        filters = cls.get_filters_from_queryset(queryset)
+        filters = (
+            {} if queryset.query.is_empty() else
+            cls.get_filters_from_queryset(queryset)
+        )
         search_query = cls.filters_to_search_query(
             filters,
             queryset.model,
             ids_only=ids_only
         )
-        return cls(search_query, queryset=queryset, ids_only=ids_only)
+
+        return cls(
+            search_query,
+            queryset=queryset,
+            ids_only=ids_only,
+            _is_none=queryset.query.is_empty()
+        )
 
     @classmethod
     def filters_to_search_query(cls, filters, model, query=None, ids_only=False):
@@ -51,6 +60,10 @@ class SearchQueryAdapter(object):
         from .utils import get_search_query
 
         search_query = query or get_search_query(model, ids_only=ids_only)
+
+        if not filters:
+            return search_query
+
         connector = filters['connector']
         children = filters['children']
 

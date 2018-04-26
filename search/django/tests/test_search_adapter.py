@@ -88,3 +88,11 @@ class TestSearchQueryAdapter(TestCase):
         desc_qs = FooWithMeta.objects.order_by('-name')
         desc_search_qs = SearchQueryAdapter.from_queryset(asc_qs)
         self.assertSameList(desc_qs, desc_search_qs.as_model_objects(), ordered=True)
+
+    def test_none_queryset(self):
+        Foo.objects.create(name='David')
+        none_qs = Foo.objects.all().filter(name='David').none()
+        search_qs = SearchQueryAdapter.from_queryset(none_qs)
+        self.assertEqual(0, search_qs.count())
+
+
