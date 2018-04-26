@@ -21,6 +21,30 @@ status = threading.local()
 
 MAX_RANK = 2 ** 31
 
+# Default deadline to pass to search API
+_DEFAULT_DEADLINE = None
+
+# Sentinal
+_UNSET = object()
+
+# Intentially *not* using None here as we want the default to be whatever
+# the underlying search API uses as a default (which could change) and is only
+# used when `None` is passed as `deadline`
+_PROJECT_DEFAULT_DEADLINE = _UNSET
+
+
+def get_default_rpc_deadline():
+    """Return default RPC deadline as defined in Django projects settings """
+    global _PROJECT_DEFAULT_DEADLINE
+
+    if _PROJECT_DEFAULT_DEADLINE is _UNSET:
+        _PROJECT_DEFAULT_DEADLINE = getattr(
+            settings,
+            'SEARCH_RPC_DEADLINE',
+            _DEFAULT_DEADLINE
+        )
+    return _PROJECT_DEFAULT_DEADLINE
+
 
 def get_ascii_string_rank(string, max_digits=9):
     """Convert a string into a number such that when the numbers are sorted
@@ -224,4 +248,8 @@ def get_search_query(model_class, ids_only=False):
 
     index_name, document_class, _ = search_meta
     index = Index(index_name)
-    return index.search(document_class=document_class, ids_only=ids_only)
+    return index.search(
+        document_class=document_class,
+        ids_only=ids_only,
+        deadline=get_default_rpc_deadline()
+    )
