@@ -1,6 +1,6 @@
-# Thor
+# Search (Thor)
 
-Thor is a wrapper for Google App Engine's search API that uses Django-like syntax for defining documents, and searching and filtering search indexes.
+Thor (`search`) is a wrapper for Google App Engine's search API that uses Django-like syntax for defining documents, and searching and filtering search indexes.
 
 ## Example
 
@@ -9,7 +9,7 @@ Thor is a wrapper for Google App Engine's search API that uses Django-like synta
 Say your app has a database of films that needs to be searched. The first step is to define a document class describing the searchable film data:
 
 ```python
-from thor import indexes, fields
+from search import indexes, fields
 
 class FilmDocument(indexes.DocumentModel):
     title = fields.TextField()
@@ -18,11 +18,11 @@ class FilmDocument(indexes.DocumentModel):
     released = fields.DateField()
 ```
 
-To index a film document, instantiate and populate it with data, and then add it to thor's provided `Index` class. It's more likely the data would come from some other source (datastore, database, etc.) but for this example we hand-craft it:
+To index a film document, instantiate and populate it with data, and then add it to Thor's provided `Index` class. It's more likely the data would come from some other source (datastore, database, etc.) but for this example we hand-craft it:
 
 ```python
 >>> from datetime import date
->>> from thor import indexes
+>>> from search import indexes
 >>> from myapp.documents import FilmDocument
 >>>
 >>> # This gets a search index by name or creates it if it doesn't exist
